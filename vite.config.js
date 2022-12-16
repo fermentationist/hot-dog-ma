@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 // https://vitejs.dev/config/;
 
-export const API_SERVER_PORT = 4000;
+export const API_SERVER_PORT = 10000;
 const DEV_SERVER_PORT = 3000;
 export default defineConfig(({ command, mode }) => {
   return {
