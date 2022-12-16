@@ -79,7 +79,6 @@ const Home = ({
   }
 
   const onKeyDown = event => {
-    console.log("event.key:", event.key);
     const prompt = inputRef.current.value;
     if (event.key === "Enter" && prompt) {
       event.preventDefault();
@@ -88,7 +87,6 @@ const Home = ({
   }
 
   const hotDogSelectorCallback = boolean => {
-    console.log("hotDogSelectorCallback:", boolean);
     hotDogRef.current = boolean;
     submit();
   }
