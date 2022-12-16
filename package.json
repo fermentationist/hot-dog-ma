@@ -1,6 +1,6 @@
 {
-  "name": "starter-app",
-  "private": true,
+  "name": "hot-dog-ma",
+  "private": false,
   "version": "0.0.1",
   "author": {
     "email": "fermentationist@gmail.com",
