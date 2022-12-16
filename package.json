@@ -1,0 +1,41 @@
+{
+  "name": "starter-app",
+  "private": true,
+  "version": "0.0.1",
+  "author": {
+    "email": "fermentationist@gmail.com",
+    "name": "Dennis Hodges"
+  },
+  "type": "module",
+  "scripts": {
+    "client": "vite",
+    "dev": "concurrently \"npm run client\" \"node server/server.js\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "PROD_MODE=true\nexport PROD_MODE\nnpm run build\nnode server/server.js"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/lab": "^5.0.0-alpha.109",
+    "@mui/material": "^5.10.15",
+    "@mui/styled-engine-sc": "^5.10.14",
+    "axios": "^1.2.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "openai": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.5",
+    "styled-components": "^5.3.6",
+    "vite": "^3.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.24",
+    "@types/react-dom": "^18.0.8",
+    "@vitejs/plugin-react": "^2.2.0",
+    "concurrently": "^7.6.0"
+  },
+  "license": "MIT"
+}

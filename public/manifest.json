@@ -1,0 +1,17 @@
+{
+  "name": "Starter App",
+  "short_name": "Starter App",
+  "theme_color": "#242424",
+  "background_color": "#242424",
+  "display": "fullscreen",
+  "scope": "./",
+  "start_url": "./",
+  "description": "A generic React starter app",
+  "icons": [
+    {
+     "src": "./icons/favicon.ico",
+     "sizes": "64x64",
+     "type": "image/png"
+    }
+   ]
+}
