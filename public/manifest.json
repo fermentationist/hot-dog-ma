@@ -9,7 +9,7 @@
   "description": "A generic React starter app",
   "icons": [
     {
-     "src": "./icons/favicon.ico",
+     "src": "./icons/hotdog_64x64.png",
      "sizes": "64x64",
      "type": "image/png"
     }
