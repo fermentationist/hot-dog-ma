@@ -30,14 +30,18 @@ app.listen(API_SERVER_PORT, () => {
 
   setInterval(() => {
     // keep server awake
-    console.log(`Fetching ${SELF_URL} to wake up server`)
-    axios(SELF_URL)
-      .then(() =>
-        console.log("Server is awake")
-      )
-      .catch((error) => console.log(`Error fetching ${SELF_URL}: ${error.message}`));
+    console.log(`Fetching ${SELF_URL} to wake up server`);
+    axios({
+      url: SELF_URL,
+      timeout: 20000
+    })
+      .then(() => {
+        console.log("Server is awake");
+      })
+      .catch((error) => {
+        console.log(`Error fetching ${SELF_URL}: ${error.message}`)
+      });
   }, WAKE_SERVER_INTERVAL);
 });
-
 
 export default app;
