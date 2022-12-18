@@ -1,12 +1,12 @@
 {
-  "name": "Starter App",
-  "short_name": "Starter App",
+  "name": "Hot Dog-ma Prayer Generator",
+  "short_name": "Hot Dog-ma",
   "theme_color": "#242424",
   "background_color": "#242424",
   "display": "fullscreen",
   "scope": "./",
   "start_url": "./",
-  "description": "A generic React starter app",
+  "description": "A full stack React application that uses the OpenAI ChatGPT API to generate unique prayers, based on a subject of the user's choosing. Disclaimer: Generated prayers may contain strong opinions about frankfurters, weiners and the SANDWICHES that incorporate them.",
   "icons": [
     {
      "src": "./icons/hotdog_64x64.png",
