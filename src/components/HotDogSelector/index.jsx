@@ -9,7 +9,9 @@ const Container = styled.div`
   place-items: center;
 `;
 
-const Image = styled.img``;
+const Image = styled.img`
+  width: 45px;
+`;
 
 const HotDogSelector = ({ callback, defaultChecked = true }) => {
   const [checked, setChecked] = useState(defaultChecked);

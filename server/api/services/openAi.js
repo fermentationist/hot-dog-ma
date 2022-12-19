@@ -58,7 +58,8 @@ const getPrayerPrompt = (input, includeHotDogma, religion) => {
   return `Write a ${form} in the style of ${style}, about "${input}"${hotDogma}.`;
 }
 
-export const getPrayer = async (input, includeHotDogma, style = "Christianity") => {
+export const getPrayer = async (userInput, includeHotDogma, style = "Christianity") => {
+  const input = userInput.slice(0, 255); // truncate user input
   const [{categories}] = await getModeration(input);
   for (const category in categories) {
     if (categories[category] && POLICED_CATEGORIES.includes(category)) {
@@ -66,10 +67,8 @@ export const getPrayer = async (input, includeHotDogma, style = "Christianity") 
     }
   }
   const cacheKey = `${input}__${style}__${includeHotDogma}`;
-  console.log("cacheKey:", cacheKey);
   // get cached prayer
   let prayer = await memCache.get(cacheKey);
-  console.log("prayer:", prayer);
   if (!prayer) {
     const prompt = getPrayerPrompt(input, includeHotDogma, style);
     const updateFn = async () => {

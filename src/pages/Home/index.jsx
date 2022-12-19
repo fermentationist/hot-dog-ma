@@ -11,13 +11,17 @@ import useAlert from "../../hooks/useAlert";
 import useFetch from "../../hooks/useFetch";
 import { parseQueryString } from "../../utils/helpers.js";
 
-const INTRO = "Enter a subject (a word or short phrase) to generate a unique prayer using ChatGPT AI";
+const INTRO = `Enter a subject (a word or short phrase) and click "submit" to generate a unique "prayer" using the OpenAI GPT-3 Chatbot.`;
+
+const DISCLAIMER = `Intended for entertainment purposes only. Prayers are NOT guaranteed to work. (Not unless you REALLY mean it.) No claims are made regarding the authenticity of generated prayers in relation to the selected target religion. Generated prayers may contain elements of hot dog orthodoxy.`
 
 const StyledPage = styled(Page)`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 95vh;
+  width: auto;
+  max-width: clamp(50vw, 85vw, 900px);
 `;
 
 const Button = styled.button`
@@ -79,7 +83,6 @@ const Home = ({
       selectedReligion.current = decodeURIComponent(style);
       hotDogRef.current = hotdog === "false" ? false : true;
       updateUrl(`/api/openai/prayer?prompt=${prompt}&style=${style}&hotdog=${hotdog}`);
-      // refresh();
     } else {
       callAlertProm(INTRO).then(() => inputRef.current.focus());
     }
@@ -141,13 +144,12 @@ const Home = ({
   const sharePrayer = async () => {
     let queryString = window.location.search;
     if (!queryString) {
-      queryString = `?prompt=${inputRef.current.value}&style=${selectedReligion.current}&hotdog=${hotDogRef.current}`
+      queryString = `?prompt=${encodeURIComponent(inputRef.current.value)}&style=${encodeURIComponent(selectedReligion.current)}&hotdog=${encodeURIComponent(hotDogRef.current)}`
     }
-    console.log("window.location.url:", window.location)
     const [url] = window.location.href.split("?");
     const shareData = {
       title: "Hot Dog-ma Prayer Generator",
-      text: `A prayer for "${inputRef.current.value}"`,
+      text: `A prayer about "${inputRef.current.value}"`,
       url: url + queryString
     }
     const canShare = await navigator.canShare(shareData);
@@ -177,16 +179,23 @@ const Home = ({
         />
         <br/>
         <PrayerContainer>
-          <CopyIconContainer>
-            <CopyIcon onClick={copyPrayer}/>
-          </CopyIconContainer>
           {
-            "canShare" in navigator ? (
-              <ShareIconContainer>
-                <ShareIcon onClick={sharePrayer} />
-              </ShareIconContainer>
+            prayer.length ? (
+              <>
+                <CopyIconContainer>
+                  <CopyIcon onClick={copyPrayer}/>
+                </CopyIconContainer>
+                {
+                  "canShare" in navigator ? (
+                    <ShareIconContainer>
+                      <ShareIcon onClick={sharePrayer} />
+                    </ShareIconContainer>
+                  ) : null
+                }
+              </>
             ) : null
           }
+          <br/>
           {
             prayer.split("\n\n").map((stanza, stanzaIndex) => {
               return (
@@ -211,8 +220,8 @@ const Home = ({
         This app uses the <a href="https://openai.com/api/" target="_blank">
           OpenAI API
         </a>&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="#" onClick={() => setShowModal(true)}>
-          Instructions
+        <a href="#" onClick={() => callAlertProm(DISCLAIMER).then(() => inputRef.current.focus())}>
+          Disclaimer
         </a>
         <br/>
         © 2022 <a href="https://dennis-hodges.com/">
