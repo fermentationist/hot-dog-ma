@@ -27,14 +27,14 @@ const RELIGION_SUGGESTIONS = [
   }
 ];
 
-const ReligionSelector = ({callback}) => {
+const ReligionSelector = ({callback, defaultSelected = "Christianity"}) => {
   return (
     <RadioButtonGroup
       selections={RELIGION_SUGGESTIONS}
       callback={callback}
       title={null}
       size="small"
-      defaultValue="Christianity"
+      defaultValue={defaultSelected}
     />
   )
 }

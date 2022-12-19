@@ -1,4 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
+import memCache from "./localCache.js";
+
 const POLICED_CATEGORIES = ["hate", "hate/threatening", "sexual/minors"];
 
 const configuration = new Configuration({
@@ -56,13 +58,27 @@ const getPrayerPrompt = (input, includeHotDogma, religion) => {
   return `Write a ${form} in the style of ${style}, about "${input}"${hotDogma}.`;
 }
 
-export const getPrayer = async (input, includeHotDogma, style = "christianity") => {
+export const getPrayer = async (input, includeHotDogma, style = "Christianity") => {
   const [{categories}] = await getModeration(input);
   for (const category in categories) {
     if (categories[category] && POLICED_CATEGORIES.includes(category)) {
       throw(new Error("moderation violation"));
     }
   }
-  const response = await getCompletion(getPrayerPrompt(input, includeHotDogma, style));
-  return response.data.choices[0].text;
+  const cacheKey = `${input}__${style}__${includeHotDogma}`;
+  console.log("cacheKey:", cacheKey);
+  // get cached prayer
+  let prayer = await memCache.get(cacheKey);
+  console.log("prayer:", prayer);
+  if (!prayer) {
+    const prompt = getPrayerPrompt(input, includeHotDogma, style);
+    const updateFn = async () => {
+      const response = await getCompletion(prompt);
+      return response?.data?.choices && response.data.choices[0].text;
+    }
+    prayer = await updateFn();
+    // cache prayer for 24 hours (or until server restarts)
+    memCache.put(cacheKey, prayer, {updateFn, expirationTime: 1000 * 60 * 60 * 24});
+  }
+  return prayer;
 };

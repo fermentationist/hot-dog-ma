@@ -37,7 +37,8 @@ const CustomTextField = forwardRef((props, forwardedRef) => {
         onInput: props.onInput,
         onKeyDown: props.onKeyDown,
         step: props.step || "1",
-        min: props.min
+        min: props.min,
+        maxLength: props.maxLength
       }}
       className={props.className || ""}
       {...(props.register && props.register(props.name, props.validation))}

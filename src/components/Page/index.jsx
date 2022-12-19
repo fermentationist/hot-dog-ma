@@ -1,6 +1,5 @@
 import Paper from "@mui/material/Paper";
 import styled from "styled-components";
-import {styled as muiStyled} from "@mui/material/styles";
 
 const Background = styled.div`
   min-height: 100vh;
@@ -13,11 +12,8 @@ const Background = styled.div`
 const PageContainer = styled.div`
   position: absolute;
   max-width: 100vw;
-  height: calc(100vh - ${props => props.theme?.componentStyles?.Header?.desktop?.height});
+  min-height: 100vh;
   margin: 1em;
-  @media screen and (max-width: 600px) {
-    height: calc(100vh - ${props => props.theme?.componentStyles?.Header?.mobile?.height});
-  }
 `;
 
 const StyledPaper = styled(Paper)`
@@ -29,11 +25,11 @@ const StyledPaper = styled(Paper)`
   place-items: center;
 `;
 
-const Page = ({children}) => {
+const Page = ({children, className}) => {
   return (
     <Background>
       <StyledPaper>
-        <PageContainer className="page-container">
+        <PageContainer className={`page-container${className ? " " + className : ""}`}>
           {children}
         </PageContainer>
       </StyledPaper>

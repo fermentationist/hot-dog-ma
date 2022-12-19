@@ -1,4 +1,5 @@
 import Switch from "@mui/material/Switch";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import hotDogPic from "../../assets/hotdog_64x64.png";
 
@@ -11,9 +12,17 @@ const Container = styled.div`
 const Image = styled.img``;
 
 const HotDogSelector = ({ callback, defaultChecked = true }) => {
-  const onChange = (event) => {
-    const checked = event.currentTarget.checked;
+  const [checked, setChecked] = useState(defaultChecked);
+  useEffect(() => {
     callback(checked);
+  }, [checked]);
+
+  useEffect(() => {
+    setChecked(defaultChecked);
+  }, [defaultChecked]);
+
+  const onChange = event => {
+    setChecked(!checked);
   };
 
   return (
@@ -22,7 +31,7 @@ const HotDogSelector = ({ callback, defaultChecked = true }) => {
       <Switch
         size="small"
         onChange={onChange}
-        defaultChecked={defaultChecked}
+        checked={checked}
       />
     </Container>
   );

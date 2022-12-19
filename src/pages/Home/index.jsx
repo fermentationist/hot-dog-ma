@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, Fragment } from "react";
 import styled from "styled-components";
+import CopyIcon from "@mui/icons-material/ContentCopy";
+import ShareIcon from "@mui/icons-material/IosShare";
 import Page from "../../components/Page";
 import HotDogSelector from "../../components/HotDogSelector";
 import CustomTextField from "../../components/CustomTextField";
@@ -7,8 +9,16 @@ import ReligionSelector from "../../components/ReligionSelector";
 import withLoadingSpinner from "../../hoc/withLoadingSpinner";
 import useAlert from "../../hooks/useAlert";
 import useFetch from "../../hooks/useFetch";
+import { parseQueryString } from "../../utils/helpers.js";
 
 const INTRO = "Enter a subject (a word or short phrase) to generate a unique prayer using ChatGPT AI";
+
+const StyledPage = styled(Page)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 95vh;
+`;
 
 const Button = styled.button`
   margin: 1em;
@@ -28,20 +38,52 @@ const InputContainer = styled.div`
   place-items: center;
 `;
 
+const PrayerContainer = styled.div`
+  user-select: text;
+`;
+
+const CopyIconContainer = styled.div`
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+`;
+
+const ShareIconContainer = styled.div`
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+`;
+
+const Footer = styled.div`
+  margin-top: 1em;
+  display: inline-block;
+  font-size: 0.75em;
+  text-align: center;
+`;
+
 const Home = ({
   startLoading,
   doneLoading
 }) => {
   const [prayer, setPrayer] = useState("");
-  const selectedReligion = useRef("christian");
+  const selectedReligion = useRef("Christianity");
   const inputRef = useRef(null);
   const hotDogRef = useRef(true);
-  const {alertError, callAlertProm} = useAlert();
+  const {alertError, callAlertProm, callAlert} = useAlert();
   const {data: prayerData, error, loading, refresh, updateUrl} = useFetch(null);
 
   useEffect(() => {
-    callAlertProm(INTRO).then(() => inputRef.current.focus());
-  }, []);
+    const [prompt, style, hotdog] = parseQueryString(["prompt", "style", "hotdog"], window.location.search);
+    if (prompt) {
+      inputRef.current.value = decodeURIComponent(prompt);
+      selectedReligion.current = decodeURIComponent(style);
+      hotDogRef.current = hotdog === "false" ? false : true;
+      updateUrl(`/api/openai/prayer?prompt=${prompt}&style=${style}&hotdog=${hotdog}`);
+      // refresh();
+    } else {
+      callAlertProm(INTRO).then(() => inputRef.current.focus());
+    }
+  }, [window.location.search]);
 
   useEffect(() => {
     let focusTimeout;
@@ -66,7 +108,7 @@ const Home = ({
   const submit = () => {
     const prompt = inputRef.current.value;
     if (prompt) {
-      updateUrl(`/api/openai/prayer?prompt=${encodeURIComponent(inputRef.current.value)}&style=${encodeURIComponent(selectedReligion.current)}&hotdog=${encodeURIComponent(hotDogRef.current)}`);
+      updateUrl(`/api/openai/prayer?prompt=${encodeURIComponent(prompt)}&style=${encodeURIComponent(selectedReligion.current)}&hotdog=${encodeURIComponent(hotDogRef.current)}`);
       refresh();
     }
   };
@@ -91,8 +133,31 @@ const Home = ({
     submit();
   }
 
+  const copyPrayer = () => {
+    navigator.clipboard.writeText(prayer);
+    callAlert("Prayer copied to clipboard");
+  }
+
+  const sharePrayer = async () => {
+    let queryString = window.location.search;
+    if (!queryString) {
+      queryString = `?prompt=${inputRef.current.value}&style=${selectedReligion.current}&hotdog=${hotDogRef.current}`
+    }
+    console.log("window.location.url:", window.location)
+    const [url] = window.location.href.split("?");
+    const shareData = {
+      title: "Hot Dog-ma Prayer Generator",
+      text: `A prayer for "${inputRef.current.value}"`,
+      url: url + queryString
+    }
+    const canShare = await navigator.canShare(shareData);
+    if (canShare) {
+      await navigator.share(shareData);
+    }
+  }
+
   return (
-    <Page>
+    <StyledPage>
       <Container>
         <InputContainer>
           <CustomTextField
@@ -101,34 +166,60 @@ const Home = ({
             onKeyDown={onKeyDown}
             placeholder="Enter a word or phrase"
             margin="0 0 0 1.5em"
+            maxLength={256}
           />
           <Button onClick={submit}>SUBMIT</Button>
         </InputContainer>
-        <ReligionSelector callback={religionSelectorCallback}/>
+        <ReligionSelector callback={religionSelectorCallback} defaultSelected={selectedReligion.current}/>
         <HotDogSelector
           callback={hotDogSelectorCallback}
+          defaultChecked={hotDogRef.current}
         />
         <br/>
-        {
-          prayer.split("\n\n").map((stanza, stanzaIndex) => {
-            return (
-              <p key={stanzaIndex}>
-                {
-                  stanza.split("\n").map((line, lineIndex) => {
-                    return (
-                      <Fragment key={lineIndex}>
-                        <span key={lineIndex}>{line}</span>
-                        <br/>
-                      </Fragment>
-                    )
-                  })
-                }
-              </p>
-            )
-          })
-        }
+        <PrayerContainer>
+          <CopyIconContainer>
+            <CopyIcon onClick={copyPrayer}/>
+          </CopyIconContainer>
+          {
+            "canShare" in navigator ? (
+              <ShareIconContainer>
+                <ShareIcon onClick={sharePrayer} />
+              </ShareIconContainer>
+            ) : null
+          }
+          {
+            prayer.split("\n\n").map((stanza, stanzaIndex) => {
+              return (
+                <p key={stanzaIndex}>
+                  {
+                    stanza.split("\n").map((line, lineIndex) => {
+                      return (
+                        <Fragment key={lineIndex}>
+                          <span key={lineIndex}>{line}</span>
+                          <br/>
+                        </Fragment>
+                      )
+                    })
+                  }
+                </p>
+              )
+            })
+          }
+        </PrayerContainer>
       </Container>
-    </Page>);
+      <Footer>
+        This app uses the <a href="https://openai.com/api/" target="_blank">
+          OpenAI API
+        </a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="#" onClick={() => setShowModal(true)}>
+          Instructions
+        </a>
+        <br/>
+        © 2022 <a href="https://dennis-hodges.com/">
+          Dennis Hodges
+        </a>
+      </Footer>
+    </StyledPage>);
 };
 
 export default withLoadingSpinner(Home);

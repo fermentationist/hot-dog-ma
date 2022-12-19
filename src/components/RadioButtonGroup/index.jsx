@@ -17,6 +17,10 @@ const RadioButtonGroup = ({ selections, callback, title, size, defaultValue }) =
   const [value, setValue] = useState(defaultValue);
 
   useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue]);
+
+  useEffect(() => {
     callback(value);
   }, [value]);
 
