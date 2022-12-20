@@ -164,7 +164,7 @@ const Home = ({ startLoading, doneLoading }) => {
     const shareData = {
       url: encodeURI(url + queryString),
       title: "Hot Dog-ma Prayer Generator",
-      text: `🙏🏻🙏🏼🙏🏽🙏🏾🙏🏿🌭🌭🌭${inputRef.current.value}🌭🌭🌭🙏🏿🙏🏾🙏🏽🙏🏼🙏🏻`,
+      text: `a Prayer for 🌭${inputRef.current.value}🌭`,
     };
     const canShare =
       "canShare" in navigator && (await navigator.canShare(shareData));
