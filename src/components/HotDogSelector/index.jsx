@@ -15,15 +15,13 @@ const Image = styled.img`
 
 const HotDogSelector = ({ callback, defaultChecked = true }) => {
   const [checked, setChecked] = useState(defaultChecked);
-  useEffect(() => {
-    callback(checked);
-  }, [checked]);
-
+ 
   useEffect(() => {
     setChecked(defaultChecked);
   }, [defaultChecked]);
 
   const onChange = event => {
+    callback(!checked);
     setChecked(!checked);
   };
 

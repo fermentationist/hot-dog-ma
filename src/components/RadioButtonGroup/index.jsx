@@ -20,12 +20,9 @@ const RadioButtonGroup = ({ selections, callback, title, size, defaultValue }) =
     setValue(defaultValue);
   }, [defaultValue]);
 
-  useEffect(() => {
-    callback(value);
-  }, [value]);
-
   const onChange = event => {
     setValue(event.target.value);
+    callback(event.target.value);
   }
 
   return (

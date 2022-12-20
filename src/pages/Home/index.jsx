@@ -3,6 +3,7 @@ import styled from "styled-components";
 import CopyIcon from "@mui/icons-material/ContentCopy";
 import ShareIcon from "@mui/icons-material/IosShare";
 import Page from "../../components/Page";
+import Footer from "../../components/Footer";
 import HotDogSelector from "../../components/HotDogSelector";
 import CustomTextField from "../../components/CustomTextField";
 import ReligionSelector from "../../components/ReligionSelector";
@@ -13,7 +14,7 @@ import { parseQueryString } from "../../utils/helpers.js";
 
 const INTRO = `Enter a subject (a word or short phrase) and click "submit" to generate a unique "prayer" using the OpenAI GPT-3 Chatbot.`;
 
-const DISCLAIMER = `Intended for entertainment purposes only. Prayers are NOT guaranteed to work. (Not unless you REALLY mean it.) No claims are made regarding the authenticity of generated prayers in relation to the selected target religion. Generated prayers may contain elements of hot dog orthodoxy.`
+const DISCLAIMER = `Intended for entertainment purposes only. Limit of 15 requests per hour. Prayers are NOT guaranteed to work. (Not unless you REALLY mean it.) No claims are made regarding the authenticity of generated prayers in relation to the selected target religion. Generated prayers may contain elements of hot dog orthodoxy. Use at your own spiritual risk.`
 
 const StyledPage = styled(Page)`
   display: flex;
@@ -24,15 +25,15 @@ const StyledPage = styled(Page)`
   max-width: clamp(50vw, 85vw, 900px);
 `;
 
-const Button = styled.button`
-  margin: 1em;
-`;
-
-const Container = styled.div`
+const MainContainer = styled.div`
   max-width: 85vw;
   display: flex;
   flex-direction: column;
   place-items: center;
+`;
+
+const Button = styled.button`
+  margin: 1em;
 `;
 
 const InputContainer = styled.div`
@@ -58,13 +59,6 @@ const ShareIconContainer = styled.div`
   cursor: pointer;
 `;
 
-const Footer = styled.div`
-  margin-top: 1em;
-  display: inline-block;
-  font-size: 0.75em;
-  text-align: center;
-`;
-
 const Home = ({
   startLoading,
   doneLoading
@@ -79,14 +73,14 @@ const Home = ({
   useEffect(() => {
     const [prompt, style, hotdog] = parseQueryString(["prompt", "style", "hotdog"], window.location.search);
     if (prompt) {
-      inputRef.current.value = decodeURIComponent(prompt);
+      inputRef.current.value = decodeURIComponent(prompt.replace(/\+/g, " "));
       selectedReligion.current = decodeURIComponent(style);
       hotDogRef.current = hotdog === "false" ? false : true;
       updateUrl(`/api/openai/prayer?prompt=${prompt}&style=${style}&hotdog=${hotdog}`);
     } else {
       callAlertProm(INTRO).then(() => inputRef.current.focus());
     }
-  }, [window.location.search]);
+  }, [window.location.href]);
 
   useEffect(() => {
     let focusTimeout;
@@ -111,16 +105,19 @@ const Home = ({
   const submit = () => {
     const prompt = inputRef.current.value;
     if (prompt) {
-      updateUrl(`/api/openai/prayer?prompt=${encodeURIComponent(prompt)}&style=${encodeURIComponent(selectedReligion.current)}&hotdog=${encodeURIComponent(hotDogRef.current)}`);
-      refresh();
+      const searchParams = new URLSearchParams();
+      searchParams.set("prompt", prompt);
+      searchParams.set("style", selectedReligion.current);
+      searchParams.set("hotdog", hotDogRef.current);
+      const [url] = window.location.href.split("?");
+      window.history.replaceState({}, null, `${url}?${searchParams.toString()}`);
+      updateUrl(`/api/openai/prayer?${searchParams.toString()}`);
     }
   };
 
   const religionSelectorCallback = religion => {
     selectedReligion.current = religion;
-    if (inputRef.current.value) {
-      submit();
-    }
+    submit();
   }
 
   const onKeyDown = event => {
@@ -148,11 +145,11 @@ const Home = ({
     }
     const [url] = window.location.href.split("?");
     const shareData = {
+      url: encodeURI(url + queryString),
       title: "Hot Dog-ma Prayer Generator",
-      text: `A prayer about "${inputRef.current.value}"`,
-      url: url + queryString
+      text: `🙏🏻🙏🏼🙏🏽🙏🏾🙏🏿🌭🌭🌭${inputRef.current.value}🌭🌭🌭🙏🏿🙏🏾🙏🏽🙏🏼🙏🏻`,
     }
-    const canShare = await navigator.canShare(shareData);
+    const canShare = "canShare" in navigator && await navigator.canShare(shareData);
     if (canShare) {
       await navigator.share(shareData);
     }
@@ -160,7 +157,7 @@ const Home = ({
 
   return (
     <StyledPage>
-      <Container>
+      <MainContainer>
         <InputContainer>
           <CustomTextField
             name="urlInput"
@@ -215,19 +212,8 @@ const Home = ({
             })
           }
         </PrayerContainer>
-      </Container>
-      <Footer>
-        This app uses the <a href="https://openai.com/api/" target="_blank">
-          OpenAI API
-        </a>&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="#" onClick={() => callAlertProm(DISCLAIMER).then(() => inputRef.current.focus())}>
-          Disclaimer
-        </a>
-        <br/>
-        © 2022 <a href="https://dennis-hodges.com/">
-          Dennis Hodges
-        </a>
-      </Footer>
+      </MainContainer>
+      <Footer disclaimerCallback={() => callAlertProm(DISCLAIMER).then(() => inputRef.current.focus())}/>
     </StyledPage>);
 };
 
