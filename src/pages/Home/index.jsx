@@ -12,9 +12,9 @@ import useAlert from "../../hooks/useAlert";
 import useFetch from "../../hooks/useFetch";
 import { parseQueryString } from "../../utils/helpers.js";
 
-const INTRO = `Enter a subject (a word or short phrase) and click "submit" to generate a unique "prayer" using the OpenAI GPT-3 Chatbot.`;
+const INTRO = `Enter a subject (a word or short phrase) and click "submit" to generate a "prayer" about it, using the OpenAI GPT-3 Chatbot. (Chatbot responses are cached by user query for up to 24 hours. Limit of 15 requests per user, per hour.)`;
 
-const DISCLAIMER = `Intended for entertainment purposes only. Limit of 15 requests per hour. Prayers are NOT guaranteed to work. (Not unless you REALLY mean it.) No claims are made regarding the authenticity of generated prayers in relation to the selected target religion. Generated prayers may contain elements of hot dog orthodoxy. Use at your own spiritual risk.`;
+const DISCLAIMER = `Intended for entertainment purposes only. Limit of 15 requests per hour. Prayers are NOT guaranteed to work. No claims are made regarding the authenticity of generated prayers in relation to the selected target religion. Generated prayers may contain elements of hot dog orthodoxy. Use at your own spiritual risk.`;
 
 const StyledPage = styled(Page)`
   display: flex;
@@ -88,7 +88,7 @@ const Home = ({ startLoading, doneLoading }) => {
     } else {
       callAlertProm(INTRO).then(() => inputRef.current.focus());
     }
-  }, [window.location.href]);
+  }, []);
 
   useEffect(() => {
     let focusTimeout;
