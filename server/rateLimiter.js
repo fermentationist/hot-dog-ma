@@ -8,7 +8,12 @@ const rateLimitConfig = {
   windowMs: REQUEST_LIMIT_WINDOW,
   max: MAX_REQUESTS,
   standardHeaders: true,
-  message: {error: `Too many requests from this user. Maximum of ${rate} per hour.`}
+  message: {error: `Too many requests from this user. Maximum of ${rate} per hour.`},
+  keyGenerator: (req, res) => {
+    const ip = req.headers["x-forwarded-for"]?.split(",").shift() || req.socket.remoteAddress;
+    console.log(`${new Date().toISOString()}: ${ip}`);
+    return ip;
+  }
 }
 
 const rateLimiter = rateLimit(rateLimitConfig);
