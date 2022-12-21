@@ -11,6 +11,7 @@ const RadioGroup = styled(MuiRadioGroup)`
   place-content: center;
   place-items: center;
   max-width: 75vw;
+  z-index: 1;
 `;
 
 const RadioButtonGroup = ({ selections, callback, title, size, defaultValue }) => {

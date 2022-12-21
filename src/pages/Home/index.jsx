@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, Fragment } from "react";
-import styled from "styled-components";
 import CopyIcon from "@mui/icons-material/ContentCopy";
 import ShareIcon from "@mui/icons-material/IosShare";
 import Page from "../../components/Page";
@@ -11,53 +10,11 @@ import withLoadingSpinner from "../../hoc/withLoadingSpinner";
 import useAlert from "../../hooks/useAlert";
 import useFetch from "../../hooks/useFetch";
 import { parseQueryString } from "../../utils/helpers.js";
+import {StyledPage, MainContainer, Button, InputContainer, PrayerContainer, CopyIconContainer, ShareIconContainer} from "./styled";
 
 const INTRO = `Enter a subject (a word or short phrase) and click "submit" to generate a "prayer" about it, using the OpenAI GPT-3 Chatbot. (Chatbot responses are cached by user query for up to 24 hours. Limit of 15 requests per user, per hour.)`;
 
 const DISCLAIMER = `Intended for entertainment purposes only. Limit of 15 requests per hour. Prayers are NOT guaranteed to work. No claims are made regarding the authenticity of generated prayers in relation to the selected target religion. Generated prayers may contain elements of hot dog orthodoxy. Use at your own spiritual risk.`;
-
-const StyledPage = styled(Page)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 95vh;
-  width: auto;
-  max-width: clamp(50vw, 85vw, 900px);
-`;
-
-const MainContainer = styled.div`
-  max-width: 85vw;
-  display: flex;
-  flex-direction: column;
-  place-items: center;
-`;
-
-const Button = styled.button`
-  margin: 1em;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  place-content: center;
-  place-items: center;
-`;
-
-const PrayerContainer = styled.div`
-  user-select: text;
-`;
-
-const CopyIconContainer = styled.div`
-  position: absolute;
-  right: 0;
-  cursor: pointer;
-`;
-
-const ShareIconContainer = styled.div`
-  position: absolute;
-  left: 0;
-  cursor: pointer;
-`;
 
 const Home = ({ startLoading, doneLoading }) => {
   const [prayer, setPrayer] = useState("");
@@ -164,7 +121,7 @@ const Home = ({ startLoading, doneLoading }) => {
     const shareData = {
       url: encodeURI(url + queryString),
       title: "Hot Dog-ma Prayer Generator",
-      text: `a Prayer for 🌭${inputRef.current.value}🌭`,
+      text: `🌭 a Prayer for ${inputRef.current.value} 🌭`,
     };
     const canShare =
       "canShare" in navigator && (await navigator.canShare(shareData));
@@ -184,6 +141,7 @@ const Home = ({ startLoading, doneLoading }) => {
             placeholder="Enter a word or phrase"
             margin="0 0 0 1.5em"
             maxLength={256}
+            autoCapitalize="none"
           />
           <Button onClick={submit}>SUBMIT</Button>
         </InputContainer>
@@ -210,7 +168,7 @@ const Home = ({ startLoading, doneLoading }) => {
             </>
           ) : null}
           <br />
-          {prayer.split("\n\n").map((stanza, stanzaIndex) => {
+          {prayer.trim().split("\n\n").map((stanza, stanzaIndex) => {
             return (
               <p key={stanzaIndex}>
                 {stanza.split("\n").map((line, lineIndex) => {

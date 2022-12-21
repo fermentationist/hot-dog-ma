@@ -7,6 +7,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   place-items: center;
+  z-index: 1;
 `;
 
 const Image = styled.img`
