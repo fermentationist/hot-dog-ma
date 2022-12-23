@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, Fragment } from "react";
 import CopyIcon from "@mui/icons-material/ContentCopy";
 import ShareIcon from "@mui/icons-material/IosShare";
-import Page from "../../components/Page";
 import Footer from "../../components/Footer";
 import HotDogSelector from "../../components/HotDogSelector";
 import CustomTextField from "../../components/CustomTextField";
@@ -10,7 +9,15 @@ import withLoadingSpinner from "../../hoc/withLoadingSpinner";
 import useAlert from "../../hooks/useAlert";
 import useFetch from "../../hooks/useFetch";
 import { parseQueryString } from "../../utils/helpers.js";
-import {StyledPage, MainContainer, Button, InputContainer, PrayerContainer, CopyIconContainer, ShareIconContainer} from "./styled";
+import {
+  StyledPage,
+  MainContainer,
+  Button,
+  InputContainer,
+  PrayerContainer,
+  CopyIconContainer,
+  ShareIconContainer,
+} from "./styled";
 
 const INTRO = `Enter a subject (a word or short phrase) and click "submit" to generate a "prayer" about it, using the OpenAI GPT-3 Chatbot. (Chatbot responses are cached by user query for up to 24 hours. Limit of 15 requests per user, per hour.)`;
 
@@ -103,7 +110,7 @@ const Home = ({ startLoading, doneLoading }) => {
   };
 
   const copyPrayer = () => {
-    navigator.clipboard.writeText(prayer);
+    navigator.clipboard.writeText(prayer.trim());
     callAlert("Prayer copied to clipboard");
   };
 
@@ -117,7 +124,7 @@ const Home = ({ startLoading, doneLoading }) => {
       )}&hotdog=${encodeURIComponent(hotDogRef.current)}`;
     }
     // const [url] = window.location.href.split("?");
-    const url = "https://www.hotdogisasandwich.com"
+    const url = "https://www.hotdogisasandwich.com";
     const shareData = {
       url: encodeURI(url + queryString),
       title: "Hot Dog-ma Prayer Generator",
@@ -168,20 +175,23 @@ const Home = ({ startLoading, doneLoading }) => {
             </>
           ) : null}
           <br />
-          {prayer.trim().split("\n\n").map((stanza, stanzaIndex) => {
-            return (
-              <p key={stanzaIndex}>
-                {stanza.split("\n").map((line, lineIndex) => {
-                  return (
-                    <Fragment key={lineIndex}>
-                      <span key={lineIndex}>{line}</span>
-                      <br />
-                    </Fragment>
-                  );
-                })}
-              </p>
-            );
-          })}
+          {prayer
+            .trim()
+            .split("\n\n")
+            .map((stanza, stanzaIndex) => {
+              return (
+                <p key={stanzaIndex}>
+                  {stanza.split("\n").map((line, lineIndex) => {
+                    return (
+                      <Fragment key={lineIndex}>
+                        <span key={lineIndex}>{line}</span>
+                        <br />
+                      </Fragment>
+                    );
+                  })}
+                </p>
+              );
+            })}
         </PrayerContainer>
       </MainContainer>
       <Footer
