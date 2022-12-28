@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import axios from "axios";
+import wakeDyno from "woke-dyno";
 import rateLimiter from "./rateLimiter.js";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
@@ -28,20 +28,16 @@ app.use("/api", rateLimiter, apiRouter);
 app.listen(API_SERVER_PORT, () => {
   console.log(`Express app listening on port ${API_SERVER_PORT}`);
 
-  setInterval(() => {
-    // keep server awake
-    console.log(`Fetching ${SELF_URL} to wake up server`);
-    axios({
-      url: SELF_URL,
-      timeout: 20000
-    })
-      .then(() => {
-        console.log("Server is awake");
-      })
-      .catch((error) => {
-        console.log(`Error fetching ${SELF_URL}: ${error.message}`)
-      });
-  }, WAKE_SERVER_INTERVAL);
+  const offset = 4; // NY
+  const getOffsetHours = hours => (hours + offset) > 24 ? 24 - (hours + offset) : hours + offset;
+  const napStartHour = getOffsetHours(22);
+  const napEndHour = getOffsetHours(7)
+  wakeDyno({
+    url: SELF_URL,
+    interval: WAKE_SERVER_INTERVAL, 
+    startNap: [napStartHour, 0, 0, 0],
+    endNap: [napEndHour, 0, 0, 0]
+  }).start();
 });
 
 export default app;
