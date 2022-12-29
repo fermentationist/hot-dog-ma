@@ -11,8 +11,9 @@
     "client": "vite",
     "dev": "concurrently \"npm run client\" \"node server/server.js\"",
     "build": "vite build",
+    "install-and-build": "npm install\nnpm run build",
     "preview": "vite preview",
-    "start": "PROD_MODE=true\nexport PROD_MODE\nnpm run build\nnode server/server.js"
+    "start": "PROD_MODE=true\nexport PROD_MODE\nnode server/server.js"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
