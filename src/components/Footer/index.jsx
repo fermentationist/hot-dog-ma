@@ -10,7 +10,7 @@ const Container = styled.div`
 const Footer = ({disclaimerCallback}) => {
   return (
     <Container>
-      This app uses the <a href="https://openai.com/api/" target="_blank">
+      This app uses the <a href="https://beta.openai.com/docs/introduction" target="_blank">
         OpenAI API
       </a>&nbsp;&nbsp;|&nbsp;&nbsp;
       <a href="#" onClick={disclaimerCallback}>

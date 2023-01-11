@@ -32,7 +32,7 @@
     "react-router-dom": "^6.4.5",
     "styled-components": "^5.3.6",
     "vite": "^3.2.3",
-    "woke-dyno": "^0.0.4"
+    "woke-dyno": "^1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
