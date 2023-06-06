@@ -29,9 +29,9 @@ app.listen(API_SERVER_PORT, () => {
   console.log(`Express app listening on port ${API_SERVER_PORT}`);
 
   const offset = 4; // NY
-  const getOffsetHours = hours => (hours + offset) > 24 ? 24 - (hours + offset) : hours + offset;
-  const napStartHour = getOffsetHours(22);
-  const napEndHour = getOffsetHours(7)
+  const getOffsetHours = (hours) => (hours + offset) > 24 ? Math.abs(24 - (hours + offset)) : hours + offset;
+  const napStartHour = getOffsetHours(18);
+  const napEndHour = getOffsetHours(8)
   wakeDyno({
     url: SELF_URL,
     interval: WAKE_SERVER_INTERVAL, 
