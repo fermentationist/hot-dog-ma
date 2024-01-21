@@ -1,25 +1,33 @@
-import { Configuration, OpenAIApi } from "openai";
+import OpenAIApi from "openai";
 import memCache from "./localCache.js";
 
+const GPT_MODEL = process.env.GPT_MODEL || "gpt-3.5-turbo";
 const POLICED_CATEGORIES = ["hate", "hate/threatening", "sexual/minors"];
+const TOKEN_LIMIT = 2048;
+const MODEL_TEMPERATURE = 0.95;
 
-const configuration = new Configuration({
+const configuration = {
   apiKey: process.env.OPENAI_API_KEY,
-});
+};
 const openai = new OpenAIApi(configuration);
 
 export const getModeration = async input => {
-  const response = await openai.createModeration({input});
-  return response?.data?.results;
+  const response = await openai.moderations.create({input});
+  return response?.results?.[0]?.categories;
 }
 
-export const getCompletion = prompt => {
-  return openai.createCompletion({
-    model: "text-davinci-003",
-    prompt,
-    max_tokens: 256,
-    temperature: 0.95
-  })
+export const getCompletion = async prompt => {
+  const response = await openai.chat.completions.create({
+    model: GPT_MODEL,
+    messages: [{role: "user", content: prompt}],
+    max_tokens: TOKEN_LIMIT,
+    temperature: MODEL_TEMPERATURE,
+  });
+  console.log("\nGPT response:", response.choices?.[0]?.message)
+  console.log("\nGPT model used:", response?.model);
+  console.log("Total tokens:", response?.usage?.total_tokens);
+  return response?.choices &&
+      response.choices?.[0]?.message?.content;
 }
 
 const getPrayerPrompt = (input, includeHotDogma, religion) => {
@@ -60,10 +68,12 @@ const getPrayerPrompt = (input, includeHotDogma, religion) => {
 
 export const getPrayer = async (userInput, includeHotDogma, style = "Christianity") => {
   const input = userInput.slice(0, 255); // truncate user input
-  const [{categories}] = await getModeration(input);
-  for (const category in categories) {
-    if (categories[category] && POLICED_CATEGORIES.includes(category)) {
-      throw(new Error("moderation violation"));
+  const categories = await getModeration(input);
+  if (categories) {
+    for (const category in categories) {
+      if (categories[category] && POLICED_CATEGORIES.includes(category)) {
+        throw(new Error("moderation violation"));
+      }
     }
   }
   const cacheKey = `${input}__${style}__${includeHotDogma}`;
@@ -73,7 +83,7 @@ export const getPrayer = async (userInput, includeHotDogma, style = "Christianit
     const prompt = getPrayerPrompt(input, includeHotDogma, style);
     const updateFn = async () => {
       const response = await getCompletion(prompt);
-      return response?.data?.choices && response.data.choices[0].text;
+      return response;
     }
     prayer = await updateFn();
     // cache prayer for 24 hours (or until server restarts)
